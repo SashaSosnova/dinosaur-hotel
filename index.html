@@ -1,0 +1,1987 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Отель динозаврика</title>
+  <style>
+    :root {
+      --wood-light: #c4a574;
+      --wood-mid: #a67c52;
+      --wood-dark: #7a5638;
+      --wall: #e8d5b5;
+      --wall-shadow: #d4c09a;
+      --desk: #6b4423;
+      --desk-top: #8b5a2b;
+      --accent: #2d6a4f;
+      --danger: #c1121f;
+      --ok: #40916c;
+      --hud-bg: rgba(28, 20, 12, 0.82);
+      --toast-bg: rgba(20, 14, 8, 0.92);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      background: #1a120c;
+      color: #fff;
+      min-height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    #game {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #game.shake {
+      animation: shake 0.55s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translate(0); }
+      15% { transform: translate(-10px, 4px) rotate(-1deg); }
+      30% { transform: translate(10px, -4px) rotate(1deg); }
+      45% { transform: translate(-8px, 2px); }
+      60% { transform: translate(8px, -2px); }
+      75% { transform: translate(-4px, 1px); }
+    }
+
+    /* ===== SCENE ===== */
+    .scene {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ceiling {
+      height: 12%;
+      background: linear-gradient(180deg, #5c4030 0%, #8b6914 40%, #a67c52 100%);
+      border-bottom: 4px solid #5c4030;
+      position: relative;
+      z-index: 2;
+    }
+
+    .ceiling::after {
+      content: "";
+      position: absolute;
+      bottom: -8px;
+      left: 0; right: 0;
+      height: 8px;
+      background: repeating-linear-gradient(90deg, #6b4423 0 40px, #5c4030 40px 42px);
+    }
+
+    .back-wall {
+      flex: 1;
+      background:
+        linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.08) 100%),
+        repeating-linear-gradient(90deg, var(--wall) 0 48px, var(--wall-shadow) 48px 50px);
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+      padding: 0 2% 0 3%;
+      min-height: 0;
+    }
+
+    .hotel-sign {
+      position: absolute;
+      top: 4%;
+      left: 50%;
+      transform: translateX(-58%);
+      font-size: clamp(14px, 2.2vw, 22px);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #5c4030;
+      text-shadow: 1px 1px 0 #f5e6c8;
+      background: #f0d9a8;
+      padding: 6px 18px;
+      border: 3px solid #8b6914;
+      border-radius: 4px;
+      z-index: 3;
+    }
+
+    .rooms {
+      display: flex;
+      gap: clamp(8px, 1.5vw, 18px);
+      align-items: flex-end;
+      height: 72%;
+      width: 62%;
+      z-index: 4;
+    }
+
+    .room {
+      flex: 1;
+      height: 100%;
+      max-width: 110px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .door {
+      width: 100%;
+      height: 85%;
+      background:
+        linear-gradient(90deg, rgba(0,0,0,0.15) 0%, transparent 8%, transparent 92%, rgba(0,0,0,0.2) 100%),
+        linear-gradient(180deg, #8b5a2b 0%, #6b4423 100%);
+      border: 3px solid #4a2f1a;
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      position: relative;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.25);
+      transition: transform 0.3s ease;
+    }
+
+    .door.open {
+      transform: perspective(400px) rotateY(-28deg);
+      transform-origin: left center;
+    }
+
+    .door-panel {
+      position: absolute;
+      inset: 12% 14%;
+      border: 2px solid #5c3a1e;
+      border-radius: 3px;
+      background: linear-gradient(180deg, #9a6838 0%, #7a4e28 100%);
+    }
+
+    .door-knob {
+      position: absolute;
+      right: 10%;
+      top: 48%;
+      width: 10px;
+      height: 10px;
+      background: radial-gradient(circle at 30% 30%, #ffe08a, #c9a227);
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    .door-number {
+      position: absolute;
+      top: 6%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28px;
+      height: 28px;
+      background: #f5e6c8;
+      border: 2px solid #5c4030;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      color: #5c4030;
+      z-index: 2;
+    }
+
+    .occupied-sign {
+      position: absolute;
+      top: 18%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #c1121f;
+      color: #fff;
+      font-size: clamp(8px, 1.1vw, 11px);
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      padding: 4px 7px;
+      border-radius: 3px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.45);
+      opacity: 0;
+      transition: opacity 0.25s;
+      z-index: 5;
+      white-space: nowrap;
+      border: 1px solid #7a0a12;
+    }
+
+    .room.occupied .occupied-sign { opacity: 1; }
+
+    .guest-icon {
+      position: absolute;
+      bottom: 18%;
+      left: 50%;
+      transform: translateX(-50%) scale(0.45);
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .room.occupied .guest-icon { opacity: 1; }
+
+    /* Reception area */
+    .reception-area {
+      position: absolute;
+      right: 2%;
+      bottom: 0;
+      width: 34%;
+      height: 95%;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .reception-wall {
+      position: absolute;
+      inset: 0 8% 35% 8%;
+      background:
+        linear-gradient(180deg, #d4b896, #c4a574);
+      border: 3px solid #8b6914;
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.08);
+    }
+
+    .reception-wall::before {
+      content: "РЕСЕПШЕН";
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(11px, 1.4vw, 16px);
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      color: #5c4030;
+      background: #f0d9a8;
+      padding: 4px 12px;
+      border: 2px solid #8b6914;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+
+    .dino-wrap {
+      position: absolute;
+      bottom: 38%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 6;
+    }
+
+    .desk {
+      position: relative;
+      width: 88%;
+      height: 22%;
+      z-index: 7;
+      margin-bottom: 0;
+    }
+
+    .desk-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 28%;
+      background: linear-gradient(180deg, #a67c52, var(--desk-top));
+      border: 3px solid #4a2f1a;
+      border-radius: 6px;
+      z-index: 2;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    .desk-body {
+      position: absolute;
+      top: 22%;
+      left: 6%;
+      right: 6%;
+      bottom: 0;
+      background: linear-gradient(180deg, var(--desk) 0%, #4a2f1a 100%);
+      border: 3px solid #3a2410;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+    }
+
+    .desk-body::before {
+      content: "";
+      position: absolute;
+      top: 20%;
+      left: 12%;
+      right: 12%;
+      height: 35%;
+      background: #3a2410;
+      border-radius: 4px;
+      border: 2px solid #2a1808;
+    }
+
+    .floor {
+      height: 28%;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 12%),
+        repeating-linear-gradient(
+          90deg,
+          var(--wood-mid) 0px,
+          var(--wood-light) 18px,
+          var(--wood-mid) 36px,
+          var(--wood-dark) 38px
+        );
+      perspective: 600px;
+      position: relative;
+      z-index: 3;
+      transform-style: preserve-3d;
+      box-shadow: inset 0 20px 40px rgba(0,0,0,0.15);
+    }
+
+    .floor::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(90, 60, 30, 0.15) 100%
+      );
+      pointer-events: none;
+    }
+
+    .floor-perspective {
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          transparent 0,
+          transparent 48px,
+          rgba(0,0,0,0.08) 48px,
+          rgba(0,0,0,0.08) 50px
+        );
+      transform: perspective(500px) rotateX(12deg);
+      transform-origin: top center;
+      opacity: 0.7;
+    }
+
+    /* ===== ANIMALS (CSS sprites) ===== */
+    .animal {
+      position: relative;
+      width: 70px;
+      height: 90px;
+    }
+
+    .animal .body { position: absolute; }
+    .animal .eye {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #1a1a1a;
+      border-radius: 50%;
+      z-index: 3;
+    }
+    .animal .eye::after {
+      content: "";
+      position: absolute;
+      top: 1px; left: 2px;
+      width: 3px; height: 3px;
+      background: #fff;
+      border-radius: 50%;
+    }
+
+    .animal.monster.sign-eyes .eye {
+      background: #ff0040;
+      box-shadow: 0 0 8px #ff0040, 0 0 16px #ff2060, 0 0 4px #ff6080;
+      animation: glow 0.7s ease-in-out infinite alternate;
+    }
+    .animal.monster.sign-eyes .eye::after {
+      background: #ffcccc;
+      top: 2px; left: 2px;
+      width: 2px; height: 2px;
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 6px #ff0040, 0 0 12px #ff2060; }
+      to { box-shadow: 0 0 12px #ff0040, 0 0 24px #ff4060, 0 0 8px #ff8080; }
+    }
+
+    /* Monster holes */
+    .holes {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 8;
+      pointer-events: none;
+    }
+    .animal.monster.sign-holes .holes { display: block; }
+
+    .hole {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #3a2010 0%, #1a0c06 55%, #0a0402 100%);
+      box-shadow:
+        inset 0 1px 2px rgba(255,255,255,0.12),
+        0 0 0 1px rgba(0,0,0,0.35);
+    }
+    .hole.h1 { width: 9px; height: 9px; }
+    .hole.h2 { width: 7px; height: 7px; }
+    .hole.h3 { width: 11px; height: 8px; }
+    .hole.h4 { width: 6px; height: 6px; }
+
+    .capibara.sign-holes .hole.h1 { top: 34px; left: 22px; }
+    .capibara.sign-holes .hole.h2 { top: 42px; left: 40px; }
+    .capibara.sign-holes .hole.h3 { top: 28px; left: 48px; }
+    .capibara.sign-holes .hole.h4 { top: 50px; left: 28px; }
+
+    .giraffe.sign-holes .hole.h1 { top: 52px; left: 14px; }
+    .giraffe.sign-holes .hole.h2 { top: 48px; left: 32px; }
+    .giraffe.sign-holes .hole.h3 { top: 22px; left: 30px; width: 8px; height: 8px; }
+    .giraffe.sign-holes .hole.h4 { top: 62px; left: 24px; }
+
+    .horse.sign-holes .hole.h1 { top: 42px; left: 16px; }
+    .horse.sign-holes .hole.h2 { top: 38px; left: 36px; }
+    .horse.sign-holes .hole.h3 { top: 18px; left: 42px; width: 8px; height: 7px; }
+    .horse.sign-holes .hole.h4 { top: 52px; left: 28px; }
+
+    /* Capibara */
+    .capibara .body {
+      width: 56px; height: 36px;
+      background: #8b6914;
+      border-radius: 50% 50% 40% 40%;
+      bottom: 14px; left: 7px;
+    }
+    .capibara .head {
+      position: absolute;
+      width: 38px; height: 32px;
+      background: #9a7a28;
+      border-radius: 45%;
+      top: 18px; left: 16px;
+      z-index: 2;
+    }
+    .capibara .ear {
+      position: absolute;
+      width: 10px; height: 10px;
+      background: #7a5a10;
+      border-radius: 50%;
+      top: 14px;
+      z-index: 1;
+    }
+    .capibara .ear.l { left: 14px; }
+    .capibara .ear.r { right: 14px; left: auto; }
+    .capibara .snout {
+      position: absolute;
+      width: 22px; height: 14px;
+      background: #6b5010;
+      border-radius: 40%;
+      bottom: 2px; left: 8px;
+    }
+    .capibara .nose {
+      position: absolute;
+      width: 8px; height: 5px;
+      background: #3a2a08;
+      border-radius: 40%;
+      bottom: 6px; left: 15px;
+      z-index: 3;
+    }
+    .capibara .leg {
+      position: absolute;
+      width: 10px; height: 16px;
+      background: #6b5010;
+      border-radius: 0 0 4px 4px;
+      bottom: 0;
+    }
+    .capibara .leg.l { left: 14px; }
+    .capibara .leg.r { right: 14px; left: auto; }
+    .capibara .eye.l { top: 28px; left: 22px; }
+    .capibara .eye.r { top: 28px; left: 40px; }
+
+    /* Giraffe */
+    .giraffe .body {
+      width: 40px; height: 28px;
+      background: #e8a838;
+      border-radius: 40%;
+      bottom: 18px; left: 8px;
+      background-image: radial-gradient(circle, #c47820 20%, transparent 21%);
+      background-size: 10px 10px;
+    }
+    .giraffe .neck {
+      position: absolute;
+      width: 12px; height: 42px;
+      background: #e8a838;
+      bottom: 40px; left: 28px;
+      border-radius: 6px 6px 0 0;
+      background-image: radial-gradient(circle, #c47820 25%, transparent 26%);
+      background-size: 8px 8px;
+      z-index: 1;
+    }
+    .giraffe .head {
+      position: absolute;
+      width: 28px; height: 18px;
+      background: #e8a838;
+      border-radius: 40% 50% 40% 40%;
+      top: 0; left: 22px;
+      z-index: 2;
+    }
+    .giraffe .horn {
+      position: absolute;
+      width: 4px; height: 10px;
+      background: #8b6914;
+      top: -8px;
+      border-radius: 2px;
+      z-index: 1;
+    }
+    .giraffe .horn.l { left: 28px; }
+    .giraffe .horn.r { left: 38px; }
+    .giraffe .horn::after {
+      content: "";
+      position: absolute;
+      top: -4px; left: -2px;
+      width: 8px; height: 8px;
+      background: #5c4030;
+      border-radius: 50%;
+    }
+    .giraffe .leg {
+      position: absolute;
+      width: 7px; height: 20px;
+      background: #e8a838;
+      bottom: 0;
+      border-radius: 0 0 3px 3px;
+    }
+    .giraffe .leg.l { left: 12px; }
+    .giraffe .leg.r { left: 32px; }
+    .giraffe .leg::after {
+      content: "";
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 5px;
+      background: #5c4030;
+      border-radius: 0 0 3px 3px;
+    }
+    .giraffe .eye.l { top: 4px; left: 26px; width: 6px; height: 6px; }
+    .giraffe .eye.r { top: 4px; left: 38px; width: 6px; height: 6px; }
+    .giraffe .spot {
+      position: absolute;
+      width: 8px; height: 8px;
+      background: #c47820;
+      border-radius: 40%;
+      z-index: 2;
+    }
+
+    /* Horse */
+    .horse .body {
+      width: 48px; height: 30px;
+      background: #5c4030;
+      border-radius: 45%;
+      bottom: 18px; left: 6px;
+    }
+    .horse .neck {
+      position: absolute;
+      width: 14px; height: 28px;
+      background: #5c4030;
+      bottom: 38px; left: 36px;
+      border-radius: 8px 8px 0 0;
+      transform: rotate(15deg);
+      z-index: 1;
+    }
+    .horse .head {
+      position: absolute;
+      width: 30px; height: 16px;
+      background: #6b4a38;
+      border-radius: 40% 50% 30% 40%;
+      top: 8px; left: 34px;
+      z-index: 2;
+      transform: rotate(10deg);
+    }
+    .horse .mane {
+      position: absolute;
+      width: 8px; height: 24px;
+      background: #3a2410;
+      top: 12px; left: 34px;
+      border-radius: 4px;
+      z-index: 0;
+      transform: rotate(12deg);
+    }
+    .horse .leg {
+      position: absolute;
+      width: 8px; height: 20px;
+      background: #5c4030;
+      bottom: 0;
+      border-radius: 0 0 3px 3px;
+    }
+    .horse .leg.l { left: 12px; }
+    .horse .leg.r { left: 36px; }
+    .horse .leg::after {
+      content: "";
+      position: absolute;
+      bottom: 0; left: -1px; right: -1px;
+      height: 5px;
+      background: #1a120c;
+      border-radius: 0 0 3px 3px;
+    }
+    .horse .tail {
+      position: absolute;
+      width: 6px; height: 22px;
+      background: #3a2410;
+      bottom: 28px; left: 2px;
+      border-radius: 3px;
+      transform: rotate(-25deg);
+    }
+    .horse .eye.l { top: 10px; left: 40px; width: 6px; height: 6px; }
+    .horse .eye.r { top: 10px; left: 50px; width: 6px; height: 6px; }
+
+    /* Dino admin */
+    .dino {
+      width: 90px;
+      height: 100px;
+      position: relative;
+      transition: transform 0.2s;
+    }
+    .dino .body {
+      position: absolute;
+      width: 55px; height: 48px;
+      background: #52b788;
+      border-radius: 50% 50% 40% 40%;
+      bottom: 18px; left: 18px;
+      z-index: 2;
+    }
+    .dino .belly {
+      position: absolute;
+      width: 30px; height: 28px;
+      background: #95d5b2;
+      border-radius: 50%;
+      bottom: 26px; left: 30px;
+      z-index: 3;
+    }
+    .dino .head {
+      position: absolute;
+      width: 48px; height: 40px;
+      background: #52b788;
+      border-radius: 50%;
+      top: 4px; left: 22px;
+      z-index: 4;
+    }
+    .dino .snout {
+      position: absolute;
+      width: 28px; height: 16px;
+      background: #40916c;
+      border-radius: 40%;
+      top: 28px; left: 34px;
+      z-index: 5;
+    }
+    .dino .eye {
+      position: absolute;
+      width: 12px; height: 14px;
+      background: #fff;
+      border-radius: 50%;
+      top: 14px;
+      z-index: 6;
+      border: 1px solid #2d6a4f;
+    }
+    .dino .eye::after {
+      content: "";
+      position: absolute;
+      width: 6px; height: 8px;
+      background: #1a1a1a;
+      border-radius: 50%;
+      top: 3px; left: 3px;
+    }
+    .dino .eye.l { left: 28px; }
+    .dino .eye.r { left: 48px; }
+    .dino .mouth {
+      position: absolute;
+      top: 36px; left: 40px;
+      width: 16px; height: 8px;
+      border-bottom: 3px solid #2d6a4f;
+      border-radius: 0 0 50% 50%;
+      z-index: 6;
+      transition: all 0.3s;
+    }
+    .dino.happy .mouth {
+      width: 20px; height: 10px;
+      border-bottom: 3px solid #1b4332;
+      left: 38px;
+    }
+    .dino.sad .mouth {
+      width: 16px; height: 8px;
+      border-bottom: none;
+      border-top: 3px solid #2d6a4f;
+      border-radius: 50% 50% 0 0;
+      top: 40px;
+    }
+    .dino .arm {
+      position: absolute;
+      width: 12px; height: 22px;
+      background: #52b788;
+      border-radius: 6px;
+      bottom: 30px;
+      z-index: 1;
+    }
+    .dino .arm.l { left: 8px; transform: rotate(20deg); }
+    .dino .arm.r { right: 8px; left: auto; transform: rotate(-20deg); }
+    .dino .leg {
+      position: absolute;
+      width: 14px; height: 20px;
+      background: #40916c;
+      border-radius: 0 0 6px 6px;
+      bottom: 0;
+      z-index: 1;
+    }
+    .dino .leg.l { left: 24px; }
+    .dino .leg.r { left: 50px; }
+    .dino .spike {
+      position: absolute;
+      width: 0; height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 12px solid #2d6a4f;
+      z-index: 1;
+    }
+    .dino .spike.s1 { top: 0; left: 36px; }
+    .dino .spike.s2 { top: 10px; left: 18px; transform: rotate(-30deg); }
+    .dino .spike.s3 { top: 10px; left: 56px; transform: rotate(30deg); }
+    .dino .tail {
+      position: absolute;
+      width: 30px; height: 12px;
+      background: #52b788;
+      border-radius: 0 50% 50% 0;
+      bottom: 28px; left: -8px;
+      transform: rotate(-20deg);
+      z-index: 0;
+    }
+
+    /* Guest at desk */
+    .guest-slot {
+      position: absolute;
+      bottom: 18%;
+      left: 4%;
+      width: 90px;
+      height: 110px;
+      z-index: 10;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .guest-slot .animal {
+      animation: walk-in 0.5s ease-out;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.35));
+    }
+
+    .guest-slot .animal.leaving {
+      animation: walk-out 0.6s ease-in forwards;
+    }
+
+    .guest-slot .animal.checking-out {
+      animation: check-out 0.8s ease-in forwards;
+    }
+
+    @keyframes walk-in {
+      from { transform: translateX(-100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes walk-out {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(-140px); opacity: 0; }
+    }
+    @keyframes check-out {
+      0% { transform: translateX(0) scale(1); opacity: 1; }
+      40% { transform: translateX(30px) scale(1); opacity: 1; }
+      100% { transform: translateX(-160px) scale(0.9); opacity: 0; }
+    }
+
+    .crowd-line {
+      position: absolute;
+      bottom: 12%;
+      right: 88%;
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: flex-end;
+      gap: 6px;
+      z-index: 5;
+      pointer-events: none;
+      min-height: 90px;
+    }
+
+    .crowd-line .crowd-member {
+      transform: scale(0.72);
+      opacity: 0.75;
+      filter: drop-shadow(0 3px 4px rgba(0,0,0,0.3));
+      animation: crowd-arrive 0.45s ease-out;
+      flex-shrink: 0;
+    }
+
+    .crowd-line .crowd-member:nth-child(1) { opacity: 0.85; transform: scale(0.78); }
+    .crowd-line .crowd-member:nth-child(n+5) { opacity: 0.55; transform: scale(0.62); }
+
+    @keyframes crowd-arrive {
+      from { transform: translateX(-50px) scale(0.6); opacity: 0; }
+      to { transform: scale(0.72); opacity: 0.75; }
+    }
+
+    /* ===== HUD ===== */
+    .hud {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      z-index: 20;
+      padding: 10px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .hud-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .timer-block {
+      background: var(--hud-bg);
+      padding: 8px 14px;
+      border-radius: 10px;
+      min-width: 180px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .timer-label {
+      font-size: 12px;
+      opacity: 0.7;
+      margin-bottom: 2px;
+    }
+
+    .timer-value {
+      font-size: 22px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-bar {
+      height: 6px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 3px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+
+    .timer-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #52b788, #95d5b2);
+      border-radius: 3px;
+      transition: width 0.2s linear;
+    }
+
+    .timer-fill.urgent {
+      background: linear-gradient(90deg, #c1121f, #e63946);
+    }
+
+    .stats {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      background: var(--hud-bg);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      border: 1px solid rgba(255,255,255,0.1);
+      white-space: nowrap;
+    }
+
+    .stat strong {
+      color: #95d5b2;
+      margin-left: 4px;
+    }
+
+    .stat.score strong { color: #ffd166; font-size: 16px; }
+
+    /* ===== BUTTONS ===== */
+    .actions {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: min(320px, 90vw);
+      pointer-events: auto;
+    }
+
+    .actions button {
+      padding: 14px 24px;
+      font-size: 18px;
+      font-weight: 800;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: transform 0.1s, filter 0.15s, opacity 0.2s;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+      font-family: inherit;
+    }
+
+    .actions button:active:not(:disabled) {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.3);
+    }
+
+    .actions button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-checkin {
+      background: linear-gradient(180deg, #52b788, #2d6a4f);
+      color: #fff;
+      order: 1;
+    }
+
+    .btn-reject {
+      background: linear-gradient(180deg, #e63946, #9b2226);
+      color: #fff;
+      order: 2;
+    }
+
+    .btn-checkin:hover:not(:disabled) { filter: brightness(1.1); }
+    .btn-reject:hover:not(:disabled) { filter: brightness(1.1); }
+
+    /* ===== TOAST ===== */
+    .toasts {
+      position: absolute;
+      top: 110px;
+      right: 16px;
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 280px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--toast-bg);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      border-left: 4px solid #52b788;
+      animation: toast-in 0.3s ease-out;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .toast.bad { border-left-color: #e63946; }
+    .toast.warn { border-left-color: #ffd166; }
+
+    @keyframes toast-in {
+      from { transform: translateX(40px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* ===== OVERLAYS ===== */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 6, 4, 0.88);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .overlay.hidden { display: none; }
+
+    .panel {
+      background: linear-gradient(160deg, #3d2b1f 0%, #2a1c14 100%);
+      border: 3px solid #8b6914;
+      border-radius: 16px;
+      padding: 36px 40px;
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .panel h1 {
+      font-size: clamp(24px, 4vw, 36px);
+      margin-bottom: 8px;
+      color: #95d5b2;
+    }
+
+    .panel h2 {
+      font-size: 22px;
+      margin-bottom: 16px;
+      color: #ffd166;
+    }
+
+    .panel p {
+      opacity: 0.85;
+      line-height: 1.5;
+      margin-bottom: 12px;
+      font-size: 15px;
+    }
+
+    .panel .hint {
+      font-size: 13px;
+      opacity: 0.65;
+      margin-bottom: 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 12px;
+      margin-top: 8px;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 20px 0;
+      text-align: left;
+    }
+
+    .results-grid .item {
+      background: rgba(0,0,0,0.25);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .results-grid .item span {
+      display: block;
+      opacity: 0.6;
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .results-grid .item strong {
+      font-size: 20px;
+      color: #95d5b2;
+    }
+
+    .results-grid .item.big {
+      grid-column: 1 / -1;
+      text-align: center;
+    }
+
+    .results-grid .item.big strong {
+      font-size: 36px;
+      color: #ffd166;
+    }
+
+    .panel button {
+      margin-top: 8px;
+      padding: 14px 36px;
+      font-size: 18px;
+      font-weight: 800;
+      background: linear-gradient(180deg, #52b788, #2d6a4f);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 0 #1b4332;
+    }
+
+    .panel button:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #1b4332;
+    }
+
+    .howto {
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 12px 0 20px;
+      opacity: 0.9;
+    }
+
+    .howto li { margin-bottom: 4px; }
+
+    /* ===== SHOP ===== */
+    .shop-btn {
+      pointer-events: auto;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      font-family: inherit;
+      border: 1px solid rgba(255,209,102,0.45);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #5c4030, #3d2b1f);
+      color: #ffd166;
+      cursor: pointer;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.35);
+    }
+    .shop-btn:active { transform: translateY(2px); box-shadow: none; }
+
+    .stat.coins strong { color: #ffd166; }
+
+    .shop-panel {
+      text-align: left;
+      max-width: 440px;
+    }
+    .shop-panel h2 {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .shop-balance {
+      text-align: center;
+      margin-bottom: 16px;
+      font-size: 15px;
+      opacity: 0.9;
+    }
+    .shop-balance strong {
+      color: #ffd166;
+      font-size: 22px;
+    }
+    .shop-items {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .shop-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .shop-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .shop-item-info strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 2px;
+      color: #fff;
+    }
+    .shop-item-info span {
+      font-size: 12px;
+      opacity: 0.7;
+      line-height: 1.35;
+    }
+    .shop-item-buy {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .shop-price {
+      font-size: 13px;
+      font-weight: 800;
+      color: #ffd166;
+      white-space: nowrap;
+    }
+    .shop-item button {
+      margin: 0;
+      padding: 8px 14px;
+      font-size: 13px;
+      box-shadow: 0 2px 0 #1b4332;
+    }
+    .shop-item button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .shop-item button.secondary {
+      background: linear-gradient(180deg, #a67c52, #6b4423);
+      box-shadow: 0 2px 0 #3a2410;
+    }
+    .panel-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .panel-actions button {
+      margin-top: 0;
+    }
+    .panel button.ghost {
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.25);
+      box-shadow: none;
+      color: #fff;
+    }
+
+    @media (max-width: 700px) {
+      .rooms { width: 58%; height: 65%; }
+      .reception-area { width: 40%; }
+      .hotel-sign { font-size: 12px; padding: 4px 10px; left: 42%; }
+      .actions { bottom: 10px; }
+      .actions button { padding: 12px 16px; font-size: 15px; }
+      .stat { font-size: 11px; padding: 4px 8px; }
+      .toasts { top: 140px; max-width: 200px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <!-- Start screen -->
+    <div id="start-overlay" class="overlay" role="dialog" aria-modal="true">
+      <div class="panel">
+        <h1>Отель динозаврика</h1>
+        <p>Вы — помощник зелёного динозаврика-администратора. Заселяйте добрых зверей и прогоняйте монстров!</p>
+        <ul class="howto">
+          <li>Ищите признаки монстра: <strong>красные глаза</strong> или <strong>дырочки</strong> на теле</li>
+          <li>«Заселить» — для обычных животных</li>
+          <li>«Прогнать» — для монстров</li>
+          <li>Заселённые звери сами выезжают каждые 2 сек</li>
+          <li>Раунд длится 30 секунд</li>
+        </ul>
+        <button id="btn-start" type="button">Играть</button>
+      </div>
+    </div>
+
+    <!-- Results screen -->
+    <div id="results-overlay" class="overlay hidden" role="dialog" aria-modal="true">
+      <div class="panel">
+        <h2>Раунд окончен!</h2>
+        <div class="results-grid">
+          <div class="item big">
+            <span>Очки</span>
+            <strong id="res-score">0</strong>
+          </div>
+          <div class="item">
+            <span>Заселено</span>
+            <strong id="res-checkins">0</strong>
+          </div>
+          <div class="item">
+            <span>Выселено</span>
+            <strong id="res-checkouts">0</strong>
+          </div>
+          <div class="item">
+            <span>Монстров прогнано</span>
+            <strong id="res-monsters">0</strong>
+          </div>
+          <div class="item">
+            <span>Занято в конце</span>
+            <strong id="res-occupied">0 / 5</strong>
+          </div>
+        </div>
+        <div class="panel-actions">
+          <button id="btn-again" type="button">Играть снова</button>
+          <button id="btn-shop-results" class="ghost" type="button">Магазин</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shop screen -->
+    <div id="shop-overlay" class="overlay hidden" role="dialog" aria-modal="true">
+      <div class="panel shop-panel">
+        <h2>Магазин</h2>
+        <div class="shop-balance">Монеты: <strong id="shop-coins">0</strong></div>
+        <div class="shop-items">
+          <div class="shop-item">
+            <div class="shop-item-info">
+              <strong>Ещё 1 номер</strong>
+              <span>Добавляет свободный номер в отель (сейчас: <span id="shop-room-count">5</span>)</span>
+            </div>
+            <div class="shop-item-buy">
+              <div class="shop-price">200 монет</div>
+              <button id="btn-buy-room" type="button">Купить</button>
+            </div>
+          </div>
+          <div class="shop-item">
+            <div class="shop-item-info">
+              <strong>Пропустить раунд</strong>
+              <span>Сразу завершает текущий раунд и показывает результаты</span>
+            </div>
+            <div class="shop-item-buy">
+              <div class="shop-price">400 монет</div>
+              <button id="btn-buy-skip" class="secondary" type="button">Купить</button>
+            </div>
+          </div>
+        </div>
+        <div class="panel-actions">
+          <button id="btn-shop-close" class="ghost" type="button">Закрыть</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HUD -->
+    <div class="hud">
+      <div class="hud-top">
+        <div class="timer-block">
+          <div class="timer-label">Время раунда</div>
+          <div class="timer-value"><span id="timer">30</span> с</div>
+          <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
+        </div>
+        <div class="stats">
+          <div class="stat">Номера: <strong id="stat-rooms">0 / 5</strong></div>
+          <div class="stat">Заселено: <strong id="stat-checkins">0</strong></div>
+          <div class="stat">Выселено: <strong id="stat-checkouts">0</strong></div>
+          <div class="stat">Монстров: <strong id="stat-monsters">0</strong></div>
+          <div class="stat score">Очки: <strong id="stat-score">0</strong></div>
+          <div class="stat coins">Монеты: <strong id="stat-coins">0</strong></div>
+          <button class="shop-btn" id="btn-shop" type="button">Магазин</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toasts" id="toasts"></div>
+
+    <!-- Scene -->
+    <div class="scene">
+      <div class="ceiling"></div>
+      <div class="back-wall">
+        <div class="hotel-sign">ОТЕЛЬ ДИНОЗАВРИКА</div>
+        <div class="rooms" id="rooms"></div>
+        <div class="reception-area">
+          <div class="reception-wall"></div>
+          <div class="dino-wrap">
+            <div class="dino" id="dino">
+              <div class="spike s1"></div>
+              <div class="spike s2"></div>
+              <div class="spike s3"></div>
+              <div class="tail"></div>
+              <div class="arm l"></div>
+              <div class="arm r"></div>
+              <div class="leg l"></div>
+              <div class="leg r"></div>
+              <div class="body"></div>
+              <div class="belly"></div>
+              <div class="head"></div>
+              <div class="snout"></div>
+              <div class="eye l"></div>
+              <div class="eye r"></div>
+              <div class="mouth"></div>
+            </div>
+          </div>
+          <div class="crowd-line" id="crowd-line"></div>
+          <div class="guest-slot" id="guest-slot"></div>
+          <div class="desk">
+            <div class="desk-top"></div>
+            <div class="desk-body"></div>
+          </div>
+        </div>
+      </div>
+      <div class="floor">
+        <div class="floor-perspective"></div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="actions">
+      <button class="btn-checkin" id="btn-checkin" type="button" disabled>Заселить</button>
+      <button class="btn-reject" id="btn-reject" type="button" disabled>Прогнать</button>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const ROUND_SEC = 30;
+      const GUEST_INTERVAL = 7000;
+      const FIRST_GUEST_DELAY = 800;
+      const CHECKOUT_INTERVAL = 2000;
+      const MONSTER_CHANCE = 0.28;
+      const BASE_ROOM_COUNT = 5;
+      const MAX_ROOMS = 10;
+      const MAX_CROWD = 6;
+
+      const SHOP = {
+        extraRoom: 200,
+        skipRound: 400,
+      };
+
+      const SCORES = {
+        checkinGood: 10,
+        rejectMonster: 15,
+        autoCheckout: 5,
+        rejectGood: -8,
+        checkinMonster: -20,
+        noRooms: -5,
+      };
+
+      const ANIMAL_TYPES = ["capibara", "giraffe", "horse"];
+      const ANIMAL_NAMES = {
+        capibara: "капибара",
+        giraffe: "жираф",
+        horse: "конь",
+      };
+
+      const state = {
+        playing: false,
+        score: 0,
+        coins: 0,
+        roomCount: BASE_ROOM_COUNT,
+        checkins: 0,
+        checkouts: 0,
+        monstersRejected: 0,
+        timeLeft: ROUND_SEC,
+        rooms: [],
+        currentGuest: null,
+        waitingQueue: [],
+        receptionBusy: false,
+        guestTimer: null,
+        guestInterval: null,
+        checkoutTimer: null,
+        roundTimer: null,
+        dinoMoodTimer: null,
+        shopOpenedFrom: null,
+      };
+
+      const el = {
+        game: document.getElementById("game"),
+        rooms: document.getElementById("rooms"),
+        guestSlot: document.getElementById("guest-slot"),
+        crowdLine: document.getElementById("crowd-line"),
+        dino: document.getElementById("dino"),
+        btnCheckin: document.getElementById("btn-checkin"),
+        btnReject: document.getElementById("btn-reject"),
+        btnStart: document.getElementById("btn-start"),
+        btnAgain: document.getElementById("btn-again"),
+        btnShop: document.getElementById("btn-shop"),
+        btnShopResults: document.getElementById("btn-shop-results"),
+        btnShopClose: document.getElementById("btn-shop-close"),
+        btnBuyRoom: document.getElementById("btn-buy-room"),
+        btnBuySkip: document.getElementById("btn-buy-skip"),
+        startOverlay: document.getElementById("start-overlay"),
+        resultsOverlay: document.getElementById("results-overlay"),
+        shopOverlay: document.getElementById("shop-overlay"),
+        shopCoins: document.getElementById("shop-coins"),
+        shopRoomCount: document.getElementById("shop-room-count"),
+        timer: document.getElementById("timer"),
+        timerFill: document.getElementById("timer-fill"),
+        toasts: document.getElementById("toasts"),
+        statRooms: document.getElementById("stat-rooms"),
+        statCheckins: document.getElementById("stat-checkins"),
+        statCheckouts: document.getElementById("stat-checkouts"),
+        statMonsters: document.getElementById("stat-monsters"),
+        statScore: document.getElementById("stat-score"),
+        statCoins: document.getElementById("stat-coins"),
+        resScore: document.getElementById("res-score"),
+        resCheckins: document.getElementById("res-checkins"),
+        resCheckouts: document.getElementById("res-checkouts"),
+        resMonsters: document.getElementById("res-monsters"),
+        resOccupied: document.getElementById("res-occupied"),
+      };
+
+      const MONSTER_SIGNS = ["eyes", "holes"];
+
+      function holesHTML() {
+        return `<div class="holes">
+          <div class="hole h1"></div>
+          <div class="hole h2"></div>
+          <div class="hole h3"></div>
+          <div class="hole h4"></div>
+        </div>`;
+      }
+
+      function animalHTML(type, isMonster, sign = null) {
+        const signClass = isMonster && sign ? ` monster sign-${sign}` : "";
+        const cls = `animal ${type}${signClass}`;
+        const holes = isMonster && sign === "holes" ? holesHTML() : "";
+        if (type === "capibara") {
+          return `<div class="${cls}" data-type="${type}" data-sign="${sign || ""}">
+            <div class="ear l"></div><div class="ear r"></div>
+            <div class="body"></div><div class="head"><div class="snout"></div></div>
+            <div class="nose"></div>
+            <div class="leg l"></div><div class="leg r"></div>
+            <div class="eye l"></div><div class="eye r"></div>
+            ${holes}
+          </div>`;
+        }
+        if (type === "giraffe") {
+          return `<div class="${cls}" data-type="${type}" data-sign="${sign || ""}">
+            <div class="horn l"></div><div class="horn r"></div>
+            <div class="neck"></div><div class="head"></div>
+            <div class="body"></div>
+            <div class="leg l"></div><div class="leg r"></div>
+            <div class="eye l"></div><div class="eye r"></div>
+            ${holes}
+          </div>`;
+        }
+        return `<div class="${cls}" data-type="${type}" data-sign="${sign || ""}">
+          <div class="tail"></div><div class="mane"></div>
+          <div class="neck"></div><div class="head"></div>
+          <div class="body"></div>
+          <div class="leg l"></div><div class="leg r"></div>
+          <div class="eye l"></div><div class="eye r"></div>
+          ${holes}
+        </div>`;
+      }
+
+      function createGuest() {
+        const type = ANIMAL_TYPES[Math.floor(Math.random() * ANIMAL_TYPES.length)];
+        const isMonster = Math.random() < MONSTER_CHANCE;
+        const sign = isMonster
+          ? MONSTER_SIGNS[Math.floor(Math.random() * MONSTER_SIGNS.length)]
+          : null;
+        return { type, isMonster, sign, id: Date.now() + Math.random() };
+      }
+
+      function guestSprite(guest, forceNormal = false) {
+        if (forceNormal || !guest) {
+          return animalHTML(guest.type, false, null);
+        }
+        return animalHTML(guest.type, guest.isMonster, guest.sign);
+      }
+
+      function createRoomElement(index) {
+        const room = { index, occupied: false, guest: null, el: null };
+        const div = document.createElement("div");
+        div.className = "room";
+        div.innerHTML = `
+          <div class="door" id="door-${index}">
+            <div class="door-number">${index + 1}</div>
+            <div class="door-panel"></div>
+            <div class="door-knob"></div>
+            <div class="occupied-sign">ЗАНЯТО</div>
+            <div class="guest-icon" id="icon-${index}"></div>
+          </div>`;
+        room.el = div;
+        return room;
+      }
+
+      function buildRooms() {
+        el.rooms.innerHTML = "";
+        state.rooms = [];
+        for (let i = 0; i < state.roomCount; i++) {
+          const room = createRoomElement(i);
+          state.rooms.push(room);
+          el.rooms.appendChild(room.el);
+        }
+      }
+
+      function addExtraRoom() {
+        const index = state.rooms.length;
+        const room = createRoomElement(index);
+        state.rooms.push(room);
+        el.rooms.appendChild(room.el);
+        state.roomCount = state.rooms.length;
+        updateHUD();
+        updateShopUI();
+      }
+
+      function freeRoomCount() {
+        return state.rooms.filter((r) => !r.occupied).length;
+      }
+
+      function occupiedCount() {
+        return state.rooms.filter((r) => r.occupied).length;
+      }
+
+      function updateHUD() {
+        el.statRooms.textContent = `${occupiedCount()} / ${state.roomCount}`;
+        el.statCheckins.textContent = state.checkins;
+        el.statCheckouts.textContent = state.checkouts;
+        el.statMonsters.textContent = state.monstersRejected;
+        el.statScore.textContent = state.score;
+        el.statCoins.textContent = state.coins;
+        el.timer.textContent = Math.ceil(state.timeLeft);
+        const pct = Math.max(0, (state.timeLeft / ROUND_SEC) * 100);
+        el.timerFill.style.width = pct + "%";
+        el.timerFill.classList.toggle("urgent", state.timeLeft <= 8);
+      }
+
+      function setButtons(enabled) {
+        el.btnCheckin.disabled = !enabled;
+        el.btnReject.disabled = !enabled;
+      }
+
+      function showToast(msg, kind = "ok") {
+        const t = document.createElement("div");
+        t.className = `toast${kind === "bad" ? " bad" : kind === "warn" ? " warn" : ""}`;
+        t.textContent = msg;
+        el.toasts.appendChild(t);
+        setTimeout(() => {
+          t.style.opacity = "0";
+          t.style.transition = "opacity 0.3s";
+          setTimeout(() => t.remove(), 300);
+        }, 2200);
+      }
+
+      function setDinoMood(mood) {
+        el.dino.classList.remove("happy", "sad");
+        if (mood) el.dino.classList.add(mood);
+        clearTimeout(state.dinoMoodTimer);
+        state.dinoMoodTimer = setTimeout(() => {
+          el.dino.classList.remove("happy", "sad");
+        }, 1200);
+      }
+
+      function addScore(delta) {
+        state.score += delta;
+        state.coins = Math.max(0, state.coins + delta);
+        updateHUD();
+        updateShopUI();
+      }
+
+      function updateShopUI() {
+        el.shopCoins.textContent = state.coins;
+        el.shopRoomCount.textContent = state.roomCount;
+        el.btnBuyRoom.disabled = state.coins < SHOP.extraRoom || state.roomCount >= MAX_ROOMS;
+        el.btnBuySkip.disabled = !state.playing || state.coins < SHOP.skipRound;
+        el.btnBuyRoom.textContent =
+          state.roomCount >= MAX_ROOMS ? "Макс." : "Купить";
+        el.btnBuySkip.textContent = state.playing ? "Купить" : "Только в раунде";
+      }
+
+      function openShop(from) {
+        state.shopOpenedFrom = from;
+        updateShopUI();
+        el.shopOverlay.classList.remove("hidden");
+        el.shopOverlay.setAttribute("aria-hidden", "false");
+      }
+
+      function closeShop() {
+        el.shopOverlay.classList.add("hidden");
+        el.shopOverlay.setAttribute("aria-hidden", "true");
+        state.shopOpenedFrom = null;
+      }
+
+      function buyExtraRoom() {
+        if (state.coins < SHOP.extraRoom) {
+          showToast("Недостаточно монет", "bad");
+          return;
+        }
+        if (state.roomCount >= MAX_ROOMS) {
+          showToast("Больше номеров нельзя", "warn");
+          return;
+        }
+        state.coins -= SHOP.extraRoom;
+        if (state.playing) {
+          addExtraRoom();
+        } else {
+          state.roomCount += 1;
+          buildRooms();
+          updateHUD();
+        }
+        updateShopUI();
+        showToast(`Новый номер куплен! −${SHOP.extraRoom}`);
+        setDinoMood("happy");
+      }
+
+      function buySkipRound() {
+        if (!state.playing) {
+          showToast("Пропуск доступен только во время раунда", "warn");
+          updateShopUI();
+          return;
+        }
+        if (state.coins < SHOP.skipRound) {
+          showToast("Недостаточно монет", "bad");
+          return;
+        }
+        state.coins -= SHOP.skipRound;
+        updateHUD();
+        closeShop();
+        showToast(`Раунд пропущен −${SHOP.skipRound}`, "warn");
+        endRound();
+      }
+
+      function renderGuestAtDesk(guest) {
+        el.guestSlot.innerHTML = guestSprite(guest);
+      }
+
+      function clearGuestSlot() {
+        el.guestSlot.innerHTML = "";
+      }
+
+      function renderCrowd() {
+        el.crowdLine.innerHTML = state.waitingQueue
+          .map(
+            (guest) =>
+              `<div class="crowd-member">${guestSprite(guest)}</div>`
+          )
+          .join("");
+      }
+
+      function promoteWaiting() {
+        if (!state.playing) return;
+        if (state.receptionBusy || state.currentGuest) return;
+        if (state.waitingQueue.length > 0) {
+          state.currentGuest = state.waitingQueue.shift();
+          renderCrowd();
+          renderGuestAtDesk(state.currentGuest);
+          setButtons(true);
+        }
+      }
+
+      function enqueueGuest() {
+        if (!state.playing) return;
+        const guest = createGuest();
+        if (!state.currentGuest && !state.receptionBusy) {
+          state.currentGuest = guest;
+          renderGuestAtDesk(guest);
+          setButtons(true);
+          return;
+        }
+        if (state.waitingQueue.length >= MAX_CROWD) {
+          showToast("Толпа переполнена — гость ушёл", "warn");
+          return;
+        }
+        state.waitingQueue.push(guest);
+        renderCrowd();
+        const n = state.waitingQueue.length;
+        showToast(
+          n === 1 ? "Гость встал в очередь…" : `В очереди уже ${n} гостей`,
+          "warn"
+        );
+      }
+
+      function animateLeave(isCheckout, done) {
+        const animal = el.guestSlot.querySelector(".animal");
+        if (!animal) {
+          done();
+          return;
+        }
+        animal.classList.add(isCheckout ? "checking-out" : "leaving");
+        setTimeout(() => {
+          clearGuestSlot();
+          done();
+        }, isCheckout ? 800 : 600);
+      }
+
+      function occupyRoom(guest) {
+        const room = state.rooms.find((r) => !r.occupied);
+        if (!room) return false;
+        room.occupied = true;
+        room.guest = guest;
+        room.el.classList.add("occupied");
+        const door = room.el.querySelector(".door");
+        door.classList.add("open");
+        setTimeout(() => door.classList.remove("open"), 400);
+        const icon = room.el.querySelector(".guest-icon");
+        icon.innerHTML = guestSprite(guest, true);
+        return true;
+      }
+
+      function vacateRoom(room) {
+        room.occupied = false;
+        const guest = room.guest;
+        room.guest = null;
+        room.el.classList.remove("occupied");
+        const icon = room.el.querySelector(".guest-icon");
+        icon.innerHTML = "";
+        return guest;
+      }
+
+      function eatAllGuests() {
+        el.game.classList.remove("shake");
+        void el.game.offsetWidth;
+        el.game.classList.add("shake");
+        setTimeout(() => el.game.classList.remove("shake"), 600);
+
+        let eaten = 0;
+        state.rooms.forEach((room) => {
+          if (room.occupied) {
+            vacateRoom(room);
+            eaten++;
+          }
+        });
+        return eaten;
+      }
+
+      function finishReceptionAction() {
+        state.receptionBusy = false;
+        state.currentGuest = null;
+        setButtons(false);
+        promoteWaiting();
+      }
+
+      function onCheckin() {
+        if (!state.playing || state.receptionBusy || !state.currentGuest) return;
+        const guest = state.currentGuest;
+        state.receptionBusy = true;
+        setButtons(false);
+
+        if (guest.isMonster) {
+          addScore(SCORES.checkinMonster);
+          const eaten = eatAllGuests();
+          setDinoMood("sad");
+          showToast(
+            eaten > 0
+              ? `Монстр съел всех гостей! (${eaten}) ${SCORES.checkinMonster}`
+              : `Вы заселили монстра! ${SCORES.checkinMonster}`,
+            "bad"
+          );
+          animateLeave(false, finishReceptionAction);
+          return;
+        }
+
+        if (freeRoomCount() === 0) {
+          addScore(SCORES.noRooms);
+          setDinoMood("sad");
+          showToast(`Нет свободных номеров! ${SCORES.noRooms}`, "bad");
+          // Guest stays? Spec says can't check in — penalty. Guest leaves disappointed.
+          animateLeave(false, finishReceptionAction);
+          return;
+        }
+
+        occupyRoom(guest);
+        state.checkins++;
+        addScore(SCORES.checkinGood);
+        setDinoMood("happy");
+        showToast(`Заселили: ${ANIMAL_NAMES[guest.type]}! +${SCORES.checkinGood}`);
+        updateHUD();
+        animateLeave(false, finishReceptionAction);
+      }
+
+      function onReject() {
+        if (!state.playing || state.receptionBusy || !state.currentGuest) return;
+        const guest = state.currentGuest;
+        state.receptionBusy = true;
+        setButtons(false);
+
+        if (guest.isMonster) {
+          state.monstersRejected++;
+          addScore(SCORES.rejectMonster);
+          setDinoMood("happy");
+          showToast(`Монстра прогнали! +${SCORES.rejectMonster}`);
+        } else {
+          addScore(SCORES.rejectGood);
+          setDinoMood("sad");
+          showToast(`Прогнали доброго зверя… ${SCORES.rejectGood}`, "bad");
+        }
+        updateHUD();
+        animateLeave(false, finishReceptionAction);
+      }
+
+      function autoCheckout() {
+        if (!state.playing || state.receptionBusy) return;
+        const occupied = state.rooms.filter((r) => r.occupied);
+        if (occupied.length === 0) return;
+
+        // If there's a guest at desk, checkout waits (reception busy queue)
+        if (state.currentGuest) return;
+
+        state.receptionBusy = true;
+        setButtons(false);
+
+        const room = occupied[Math.floor(Math.random() * occupied.length)];
+        const guest = vacateRoom(room);
+        updateHUD();
+
+        // Show at reception briefly then leave
+        el.guestSlot.innerHTML = guestSprite(guest, true);
+        showToast(`${ANIMAL_NAMES[guest.type]} выселяется…`, "warn");
+
+        setTimeout(() => {
+          state.checkouts++;
+          addScore(SCORES.autoCheckout);
+          showToast(`Выселение +${SCORES.autoCheckout}`);
+          updateHUD();
+          animateLeave(true, () => {
+            finishReceptionAction();
+          });
+        }, 500);
+      }
+
+      function clearGuestSpawnTimers() {
+        clearTimeout(state.guestTimer);
+        clearInterval(state.guestInterval);
+        state.guestTimer = null;
+        state.guestInterval = null;
+      }
+
+      function endRound() {
+        state.playing = false;
+        clearGuestSpawnTimers();
+        clearInterval(state.checkoutTimer);
+        clearInterval(state.roundTimer);
+        state.checkoutTimer = state.roundTimer = null;
+        setButtons(false);
+
+        el.resScore.textContent = state.score;
+        el.resCheckins.textContent = state.checkins;
+        el.resCheckouts.textContent = state.checkouts;
+        el.resMonsters.textContent = state.monstersRejected;
+        el.resOccupied.textContent = `${occupiedCount()} / ${state.roomCount}`;
+        el.resultsOverlay.classList.remove("hidden");
+        el.resultsOverlay.setAttribute("aria-hidden", "false");
+        updateShopUI();
+      }
+
+      function startRound() {
+        clearGuestSpawnTimers();
+        clearInterval(state.checkoutTimer);
+        clearInterval(state.roundTimer);
+        clearTimeout(state.dinoMoodTimer);
+        closeShop();
+
+        state.playing = true;
+        state.score = 0;
+        state.checkins = 0;
+        state.checkouts = 0;
+        state.monstersRejected = 0;
+        state.timeLeft = ROUND_SEC;
+        state.currentGuest = null;
+        state.waitingQueue = [];
+        state.receptionBusy = false;
+
+        el.startOverlay.classList.add("hidden");
+        el.startOverlay.setAttribute("aria-hidden", "true");
+        el.resultsOverlay.classList.add("hidden");
+        el.resultsOverlay.setAttribute("aria-hidden", "true");
+        clearGuestSlot();
+        renderCrowd();
+        buildRooms();
+        setButtons(false);
+        el.dino.classList.remove("happy", "sad");
+        updateHUD();
+
+        // Первый гость сразу, следующие — каждые 7 сек
+        state.guestTimer = setTimeout(() => {
+          if (!state.playing) return;
+          enqueueGuest();
+          state.guestInterval = setInterval(() => {
+            if (state.playing) enqueueGuest();
+          }, GUEST_INTERVAL);
+        }, FIRST_GUEST_DELAY);
+
+        state.checkoutTimer = setInterval(() => {
+          if (state.playing) autoCheckout();
+        }, CHECKOUT_INTERVAL);
+
+        const tickMs = 100;
+        state.roundTimer = setInterval(() => {
+          state.timeLeft -= tickMs / 1000;
+          if (state.timeLeft <= 0) {
+            state.timeLeft = 0;
+            updateHUD();
+            endRound();
+          } else {
+            updateHUD();
+          }
+        }, tickMs);
+      }
+
+      el.btnStart.addEventListener("click", startRound);
+      el.btnAgain.addEventListener("click", startRound);
+      el.btnCheckin.addEventListener("click", onCheckin);
+      el.btnReject.addEventListener("click", onReject);
+      el.btnShop.addEventListener("click", () => openShop("hud"));
+      el.btnShopResults.addEventListener("click", () => openShop("results"));
+      el.btnShopClose.addEventListener("click", closeShop);
+      el.btnBuyRoom.addEventListener("click", buyExtraRoom);
+      el.btnBuySkip.addEventListener("click", buySkipRound);
+
+      // Keyboard shortcuts
+      document.addEventListener("keydown", (e) => {
+        if (!state.playing) return;
+        if (!el.shopOverlay.classList.contains("hidden")) return;
+        if (e.key === "ArrowUp" || e.key === "w" || e.key === "W" || e.key === "1") {
+          e.preventDefault();
+          onCheckin();
+        }
+        if (e.key === "ArrowDown" || e.key === "s" || e.key === "S" || e.key === "2") {
+          e.preventDefault();
+          onReject();
+        }
+      });
+
+      buildRooms();
+      updateHUD();
+      updateShopUI();
+    })();
+  </script>
+</body>
+</html>
