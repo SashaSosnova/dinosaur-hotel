@@ -399,43 +399,146 @@
       to { box-shadow: 0 0 12px #ff0040, 0 0 24px #ff4060, 0 0 8px #ff8080; }
     }
 
-    /* Monster holes */
-    .holes {
+    /* Monster tentacles */
+    .tentacles {
       display: none;
       position: absolute;
       inset: 0;
-      z-index: 8;
+      z-index: 0;
       pointer-events: none;
     }
-    .animal.monster.sign-holes .holes { display: block; }
+    .animal.monster.sign-tentacles .tentacles { display: block; }
 
-    .hole {
+    .tentacle {
       position: absolute;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 30%, #3a2010 0%, #1a0c06 55%, #0a0402 100%);
-      box-shadow:
-        inset 0 1px 2px rgba(255,255,255,0.12),
-        0 0 0 1px rgba(0,0,0,0.35);
+      width: 10px;
+      background: linear-gradient(180deg, #6a4c93 0%, #9b5de5 55%, #c77dff 100%);
+      border-radius: 10px;
+      transform-origin: top center;
+      box-shadow: 0 0 6px rgba(155, 93, 229, 0.55);
     }
-    .hole.h1 { width: 9px; height: 9px; }
-    .hole.h2 { width: 7px; height: 7px; }
-    .hole.h3 { width: 11px; height: 8px; }
-    .hole.h4 { width: 6px; height: 6px; }
+    .tentacle::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 12px;
+      background: #9b5de5;
+      border-radius: 50%;
+      box-shadow: 0 0 5px rgba(155, 93, 229, 0.7);
+    }
+    .tentacle.t1 {
+      height: 34px;
+      top: 48px;
+      left: 2px;
+      animation: tentacle-wave 1.2s ease-in-out infinite alternate;
+    }
+    .tentacle.t2 {
+      height: 28px;
+      top: 52px;
+      right: 2px;
+      left: auto;
+      animation: tentacle-wave 1.4s ease-in-out infinite alternate-reverse;
+    }
+    .tentacle.t3 {
+      height: 22px;
+      top: 58px;
+      left: 18px;
+      animation: tentacle-wave 1.1s ease-in-out infinite alternate;
+    }
 
-    .capibara.sign-holes .hole.h1 { top: 34px; left: 22px; }
-    .capibara.sign-holes .hole.h2 { top: 42px; left: 40px; }
-    .capibara.sign-holes .hole.h3 { top: 28px; left: 48px; }
-    .capibara.sign-holes .hole.h4 { top: 50px; left: 28px; }
+    @keyframes tentacle-wave {
+      from { transform: rotate(-18deg); }
+      to { transform: rotate(16deg); }
+    }
 
-    .giraffe.sign-holes .hole.h1 { top: 52px; left: 14px; }
-    .giraffe.sign-holes .hole.h2 { top: 48px; left: 32px; }
-    .giraffe.sign-holes .hole.h3 { top: 22px; left: 30px; width: 8px; height: 8px; }
-    .giraffe.sign-holes .hole.h4 { top: 62px; left: 24px; }
+    .giraffe.sign-tentacles .tentacle.t1 { top: 58px; left: 0; }
+    .giraffe.sign-tentacles .tentacle.t2 { top: 60px; right: 0; }
+    .giraffe.sign-tentacles .tentacle.t3 { top: 66px; left: 16px; }
+    .horse.sign-tentacles .tentacle.t1 { top: 50px; }
+    .horse.sign-tentacles .tentacle.t2 { top: 52px; }
 
-    .horse.sign-holes .hole.h1 { top: 42px; left: 16px; }
-    .horse.sign-holes .hole.h2 { top: 38px; left: 36px; }
-    .horse.sign-holes .hole.h3 { top: 18px; left: 42px; width: 8px; height: 7px; }
-    .horse.sign-holes .hole.h4 { top: 52px; left: 28px; }
+    /* Monster mutation: second head */
+    .mutation-extra {
+      display: none;
+      position: absolute;
+      z-index: 7;
+      pointer-events: none;
+    }
+    .animal.monster.sign-mutation .mutation-extra { display: block; }
+
+    .mutation-extra .extra-head {
+      position: absolute;
+      border-radius: 45%;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+    }
+    .mutation-extra .extra-eye {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #1a1a1a;
+      border-radius: 50%;
+      z-index: 2;
+    }
+    .mutation-extra .extra-eye::after {
+      content: "";
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      width: 2px;
+      height: 2px;
+      background: #fff;
+      border-radius: 50%;
+    }
+
+    .capibara.sign-mutation .mutation-extra .extra-head {
+      width: 28px;
+      height: 24px;
+      background: #9a7a28;
+      top: 8px;
+      left: 38px;
+      transform: rotate(18deg);
+    }
+    .capibara.sign-mutation .mutation-extra .extra-eye.l { top: 16px; left: 44px; }
+    .capibara.sign-mutation .mutation-extra .extra-eye.r { top: 16px; left: 54px; }
+
+    .giraffe.sign-mutation .mutation-extra .extra-neck {
+      position: absolute;
+      width: 9px;
+      height: 28px;
+      background: #e8a838;
+      top: 8px;
+      left: 8px;
+      border-radius: 5px;
+      transform: rotate(-28deg);
+      background-image: radial-gradient(circle, #c47820 25%, transparent 26%);
+      background-size: 7px 7px;
+    }
+    .giraffe.sign-mutation .mutation-extra .extra-head {
+      width: 22px;
+      height: 14px;
+      background: #e8a838;
+      top: 0;
+      left: 0;
+      border-radius: 40% 50% 40% 40%;
+      transform: rotate(-20deg);
+    }
+    .giraffe.sign-mutation .mutation-extra .extra-eye.l { top: 3px; left: 4px; width: 5px; height: 5px; }
+    .giraffe.sign-mutation .mutation-extra .extra-eye.r { top: 3px; left: 12px; width: 5px; height: 5px; }
+
+    .horse.sign-mutation .mutation-extra .extra-head {
+      width: 24px;
+      height: 14px;
+      background: #6b4a38;
+      top: 0;
+      left: 8px;
+      border-radius: 40% 50% 30% 40%;
+      transform: rotate(-22deg);
+    }
+    .horse.sign-mutation .mutation-extra .extra-eye.l { top: 3px; left: 12px; width: 5px; height: 5px; }
+    .horse.sign-mutation .mutation-extra .extra-eye.r { top: 3px; left: 20px; width: 5px; height: 5px; }
 
     /* Capibara */
     .capibara .body {
@@ -1117,7 +1220,7 @@
 
     .shop-panel {
       text-align: left;
-      max-width: 440px;
+      max-width: 520px;
     }
     .shop-panel h2 {
       text-align: center;
@@ -1209,6 +1312,139 @@
       color: #fff;
     }
 
+    .menu-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+      align-items: stretch;
+    }
+    .menu-actions button {
+      margin-top: 0;
+      width: 100%;
+    }
+    .menu-actions button.ghost {
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.25);
+      box-shadow: none;
+      color: #fff;
+    }
+    .menu-actions button.ghost:active {
+      transform: translateY(2px);
+    }
+
+    .devs-list {
+      list-style: none;
+      margin: 18px 0 8px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .devs-list li {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #95d5b2;
+      text-align: center;
+    }
+
+    .shop-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .shop-tab {
+      flex: 1;
+      margin: 0 !important;
+      padding: 8px 8px !important;
+      font-size: 13px !important;
+      box-shadow: none !important;
+      background: rgba(0,0,0,0.25) !important;
+      border: 1px solid rgba(255,255,255,0.12) !important;
+      color: rgba(255,255,255,0.75) !important;
+    }
+    .shop-tab.active {
+      background: linear-gradient(180deg, #52b788, #2d6a4f) !important;
+      border-color: transparent !important;
+      color: #fff !important;
+    }
+    .shop-section { display: none; }
+    .shop-section.active { display: block; }
+
+    .boosters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .booster-card {
+      appearance: none;
+      border: 2px solid rgba(255,255,255,0.14);
+      border-radius: 22px;
+      background: linear-gradient(160deg, #3d2b1f 0%, #24160f 100%);
+      color: #fff;
+      padding: 14px 12px 12px;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: center;
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.25);
+      transition: transform 0.1s, filter 0.15s, opacity 0.2s;
+    }
+    .booster-card:hover:not(:disabled) { filter: brightness(1.08); }
+    .booster-card:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 rgba(0,0,0,0.25);
+    }
+    .booster-card:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .booster-card .booster-title {
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .booster-card .booster-desc {
+      font-size: 11px;
+      opacity: 0.7;
+      line-height: 1.3;
+      min-height: 2.6em;
+    }
+    .booster-card .booster-price {
+      font-size: 13px;
+      font-weight: 800;
+      color: #ffd166;
+    }
+    .booster-bar {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 3px;
+      margin-top: 2px;
+    }
+    .booster-bar .seg {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .booster-bar .seg.on {
+      background: linear-gradient(180deg, #4cc9f0, #0077b6);
+      border-color: #48cae4;
+      box-shadow: 0 0 6px rgba(76, 201, 240, 0.45);
+    }
+
     @media (max-width: 700px) {
       .rooms { width: 58%; height: 65%; }
       .reception-area { width: 40%; }
@@ -1222,19 +1458,29 @@
 </head>
 <body>
   <div id="game">
-    <!-- Start screen -->
+    <!-- Main menu -->
     <div id="start-overlay" class="overlay" role="dialog" aria-modal="true">
       <div class="panel">
         <h1>Отель динозаврика</h1>
-        <p>Вы — помощник зелёного динозаврика-администратора. Заселяйте добрых зверей и прогоняйте монстров!</p>
-        <ul class="howto">
-          <li>Ищите признаки монстра: <strong>красные глаза</strong> или <strong>дырочки</strong> на теле</li>
-          <li>«Заселить» — для обычных животных</li>
-          <li>«Прогнать» — для монстров</li>
-          <li>Заселённые звери сами выезжают каждые 2 сек</li>
-          <li>Раунд длится 30 секунд</li>
+        <p>Заселяйте добрых зверей и прогоняйте монстров!</p>
+        <div class="menu-actions">
+          <button id="btn-start" type="button">Играть</button>
+          <button id="btn-devs" class="ghost" type="button">Разработчики</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Developers -->
+    <div id="devs-overlay" class="overlay hidden" role="dialog" aria-modal="true">
+      <div class="panel">
+        <h2>Разработчики</h2>
+        <ul class="devs-list">
+          <li>Cursor Ai</li>
+          <li>MysterySpark</li>
         </ul>
-        <button id="btn-start" type="button">Играть</button>
+        <div class="panel-actions" style="margin-top: 20px;">
+          <button id="btn-devs-back" class="ghost" type="button">Назад</button>
+        </div>
       </div>
     </div>
 
@@ -1244,7 +1490,7 @@
         <h2>Раунд окончен!</h2>
         <div class="results-grid">
           <div class="item big">
-            <span>Очки</span>
+            <span>Очки за раунд</span>
             <strong id="res-score">0</strong>
           </div>
           <div class="item">
@@ -1261,7 +1507,7 @@
           </div>
           <div class="item">
             <span>Занято в конце</span>
-            <strong id="res-occupied">0 / 5</strong>
+            <strong id="res-occupied">0 / 2</strong>
           </div>
         </div>
         <div class="panel-actions">
@@ -1275,29 +1521,122 @@
     <div id="shop-overlay" class="overlay hidden" role="dialog" aria-modal="true">
       <div class="panel shop-panel">
         <h2>Магазин</h2>
-        <div class="shop-balance">Монеты: <strong id="shop-coins">0</strong></div>
-        <div class="shop-items">
-          <div class="shop-item">
-            <div class="shop-item-info">
-              <strong>Ещё 1 номер</strong>
-              <span>Добавляет свободный номер в отель (сейчас: <span id="shop-room-count">5</span>)</span>
+        <div class="shop-balance">Очки: <strong id="shop-coins">0</strong></div>
+        <div class="shop-tabs">
+          <button class="shop-tab active" id="tab-items" type="button">Покупки</button>
+          <button class="shop-tab" id="tab-boosters" type="button">Бустеры</button>
+          <button class="shop-tab" id="tab-coins" type="button">Коины</button>
+        </div>
+
+        <div class="shop-section active" id="section-items">
+          <div class="shop-items">
+            <div class="shop-item">
+              <div class="shop-item-info">
+                <strong>Ещё 1 номер</strong>
+                <span>Добавляет номер и ускоряет приход гостей на 1 сек (сейчас: <span id="shop-room-count">2</span>, интервал: <span id="shop-guest-interval">10</span> с)</span>
+              </div>
+              <div class="shop-item-buy">
+                <div class="shop-price">50 очков</div>
+                <button id="btn-buy-room" type="button">Купить</button>
+              </div>
             </div>
-            <div class="shop-item-buy">
-              <div class="shop-price">200 монет</div>
-              <button id="btn-buy-room" type="button">Купить</button>
-            </div>
-          </div>
-          <div class="shop-item">
-            <div class="shop-item-info">
-              <strong>Пропустить раунд</strong>
-              <span>Сразу завершает текущий раунд и показывает результаты</span>
-            </div>
-            <div class="shop-item-buy">
-              <div class="shop-price">400 монет</div>
-              <button id="btn-buy-skip" class="secondary" type="button">Купить</button>
+            <div class="shop-item">
+              <div class="shop-item-info">
+                <strong>Пропустить раунд</strong>
+                <span>Сразу завершает текущий раунд и показывает результаты</span>
+              </div>
+              <div class="shop-item-buy">
+                <div class="shop-price">400 очков</div>
+                <button id="btn-buy-skip" class="secondary" type="button">Купить</button>
+              </div>
             </div>
           </div>
         </div>
+
+        <div class="shop-section" id="section-boosters">
+          <div class="boosters-grid">
+            <button class="booster-card" id="btn-boost-salary" type="button">
+              <div class="booster-title">Зарплата</div>
+              <div class="booster-desc">Больше очков за правильные действия</div>
+              <div class="booster-price">20 очков</div>
+              <div class="booster-bar" id="bar-salary">
+                <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+              </div>
+            </button>
+            <button class="booster-card" id="btn-boost-monsters" type="button">
+              <div class="booster-title">Монстры</div>
+              <div class="booster-desc">Выше шанс появления монстров у ресепшена</div>
+              <div class="booster-price">20 очков</div>
+              <div class="booster-bar" id="bar-monsters">
+                <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+              </div>
+            </button>
+            <button class="booster-card" id="btn-boost-points" type="button">
+              <div class="booster-title">Очки</div>
+              <div class="booster-desc">Дополнительные очки за каждое верное действие</div>
+              <div class="booster-price">25 очков</div>
+              <div class="booster-bar" id="bar-points">
+                <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div class="shop-section" id="section-coins">
+          <div class="shop-items" id="coin-items">
+            <div class="shop-item" data-coin-item="cookies">
+              <div class="shop-item-info">
+                <strong>Коробка печенья</strong>
+                <span>Сразу даёт +40 очков</span>
+              </div>
+              <div class="shop-item-buy">
+                <div class="shop-price">30 очков</div>
+                <button type="button">Купить</button>
+              </div>
+            </div>
+            <div class="shop-item" data-coin-item="time">
+              <div class="shop-item-info">
+                <strong>Доп. время</strong>
+                <span>Добавляет +20 секунд к текущему раунду</span>
+              </div>
+              <div class="shop-item-buy">
+                <div class="shop-price">50 очков</div>
+                <button type="button">Купить</button>
+              </div>
+            </div>
+            <div class="shop-item" data-coin-item="guard">
+              <div class="shop-item-info">
+                <strong>Охранник</strong>
+                <span>Один раз спасает отель, если заселить монстра</span>
+              </div>
+              <div class="shop-item-buy">
+                <div class="shop-price">70 очков</div>
+                <button type="button">Купить</button>
+              </div>
+            </div>
+            <div class="shop-item" data-coin-item="double">
+              <div class="shop-item-info">
+                <strong>Удвоитель</strong>
+                <span>Следующая награда очками будет ×2</span>
+              </div>
+              <div class="shop-item-buy">
+                <div class="shop-price">60 очков</div>
+                <button type="button">Купить</button>
+              </div>
+            </div>
+            <div class="shop-item" data-coin-item="key">
+              <div class="shop-item-info">
+                <strong>Золотой ключ</strong>
+                <span>Освобождает один занятый номер и даёт награду за выселение</span>
+              </div>
+              <div class="shop-item-buy">
+                <div class="shop-price">45 очков</div>
+                <button type="button">Купить</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="panel-actions">
           <button id="btn-shop-close" class="ghost" type="button">Закрыть</button>
         </div>
@@ -1309,16 +1648,16 @@
       <div class="hud-top">
         <div class="timer-block">
           <div class="timer-label">Время раунда</div>
-          <div class="timer-value"><span id="timer">30</span> с</div>
+          <div class="timer-value"><span id="timer">2:00</span></div>
           <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
         </div>
         <div class="stats">
-          <div class="stat">Номера: <strong id="stat-rooms">0 / 5</strong></div>
+          <div class="stat">Номера: <strong id="stat-rooms">0 / 2</strong></div>
           <div class="stat">Заселено: <strong id="stat-checkins">0</strong></div>
           <div class="stat">Выселено: <strong id="stat-checkouts">0</strong></div>
           <div class="stat">Монстров: <strong id="stat-monsters">0</strong></div>
           <div class="stat score">Очки: <strong id="stat-score">0</strong></div>
-          <div class="stat coins">Монеты: <strong id="stat-coins">0</strong></div>
+          <div class="stat score">За раунд: <strong id="stat-round-score">0</strong></div>
           <button class="shop-btn" id="btn-shop" type="button">Магазин</button>
         </div>
       </div>
@@ -1377,18 +1716,32 @@
     (() => {
       "use strict";
 
-      const ROUND_SEC = 30;
-      const GUEST_INTERVAL = 7000;
+      const ROUND_SEC = 120;
+      const BASE_GUEST_INTERVAL = 10000;
+      const MIN_GUEST_INTERVAL = 3000;
       const FIRST_GUEST_DELAY = 800;
-      const CHECKOUT_INTERVAL = 2000;
-      const MONSTER_CHANCE = 0.28;
-      const BASE_ROOM_COUNT = 5;
+      const CHECKOUT_MIN_MS = 9000;
+      const CHECKOUT_MAX_MS = 10000;
+      const BASE_MONSTER_CHANCE = 0.28;
+      const BASE_ROOM_COUNT = 2;
       const MAX_ROOMS = 10;
       const MAX_CROWD = 6;
+      const MAX_BOOST = 5;
 
       const SHOP = {
-        extraRoom: 200,
+        extraRoom: 50,
         skipRound: 400,
+        salary: 20,
+        monsters: 20,
+        points: 25,
+      };
+
+      const COIN_ITEMS = {
+        cookies: { price: 30, name: "Коробка печенья" },
+        time: { price: 50, name: "Доп. время" },
+        guard: { price: 70, name: "Охранник" },
+        double: { price: 60, name: "Удвоитель" },
+        key: { price: 45, name: "Золотой ключ" },
       };
 
       const SCORES = {
@@ -1410,8 +1763,13 @@
       const state = {
         playing: false,
         score: 0,
-        coins: 0,
+        roundScore: 0,
         roomCount: BASE_ROOM_COUNT,
+        boostSalary: 0,
+        boostMonsters: 0,
+        boostPoints: 0,
+        guardShield: false,
+        doubleNextReward: false,
         checkins: 0,
         checkouts: 0,
         monstersRejected: 0,
@@ -1437,17 +1795,34 @@
         btnCheckin: document.getElementById("btn-checkin"),
         btnReject: document.getElementById("btn-reject"),
         btnStart: document.getElementById("btn-start"),
+        btnDevs: document.getElementById("btn-devs"),
+        btnDevsBack: document.getElementById("btn-devs-back"),
         btnAgain: document.getElementById("btn-again"),
         btnShop: document.getElementById("btn-shop"),
         btnShopResults: document.getElementById("btn-shop-results"),
         btnShopClose: document.getElementById("btn-shop-close"),
         btnBuyRoom: document.getElementById("btn-buy-room"),
         btnBuySkip: document.getElementById("btn-buy-skip"),
+        btnBoostSalary: document.getElementById("btn-boost-salary"),
+        btnBoostMonsters: document.getElementById("btn-boost-monsters"),
+        btnBoostPoints: document.getElementById("btn-boost-points"),
+        tabItems: document.getElementById("tab-items"),
+        tabBoosters: document.getElementById("tab-boosters"),
+        tabCoins: document.getElementById("tab-coins"),
+        sectionItems: document.getElementById("section-items"),
+        sectionBoosters: document.getElementById("section-boosters"),
+        sectionCoins: document.getElementById("section-coins"),
+        barSalary: document.getElementById("bar-salary"),
+        barMonsters: document.getElementById("bar-monsters"),
+        barPoints: document.getElementById("bar-points"),
+        coinItems: document.getElementById("coin-items"),
         startOverlay: document.getElementById("start-overlay"),
+        devsOverlay: document.getElementById("devs-overlay"),
         resultsOverlay: document.getElementById("results-overlay"),
         shopOverlay: document.getElementById("shop-overlay"),
         shopCoins: document.getElementById("shop-coins"),
         shopRoomCount: document.getElementById("shop-room-count"),
+        shopGuestInterval: document.getElementById("shop-guest-interval"),
         timer: document.getElementById("timer"),
         timerFill: document.getElementById("timer-fill"),
         toasts: document.getElementById("toasts"),
@@ -1456,7 +1831,7 @@
         statCheckouts: document.getElementById("stat-checkouts"),
         statMonsters: document.getElementById("stat-monsters"),
         statScore: document.getElementById("stat-score"),
-        statCoins: document.getElementById("stat-coins"),
+        statRoundScore: document.getElementById("stat-round-score"),
         resScore: document.getElementById("res-score"),
         resCheckins: document.getElementById("res-checkins"),
         resCheckouts: document.getElementById("res-checkouts"),
@@ -1464,21 +1839,31 @@
         resOccupied: document.getElementById("res-occupied"),
       };
 
-      const MONSTER_SIGNS = ["eyes", "holes"];
+      const MONSTER_SIGNS = ["eyes", "tentacles", "mutation"];
 
-      function holesHTML() {
-        return `<div class="holes">
-          <div class="hole h1"></div>
-          <div class="hole h2"></div>
-          <div class="hole h3"></div>
-          <div class="hole h4"></div>
-        </div>`;
+      function signExtrasHTML(sign) {
+        if (sign === "tentacles") {
+          return `<div class="tentacles">
+            <div class="tentacle t1"></div>
+            <div class="tentacle t2"></div>
+            <div class="tentacle t3"></div>
+          </div>`;
+        }
+        if (sign === "mutation") {
+          return `<div class="mutation-extra">
+            <div class="extra-neck"></div>
+            <div class="extra-head"></div>
+            <div class="extra-eye l"></div>
+            <div class="extra-eye r"></div>
+          </div>`;
+        }
+        return "";
       }
 
       function animalHTML(type, isMonster, sign = null) {
         const signClass = isMonster && sign ? ` monster sign-${sign}` : "";
         const cls = `animal ${type}${signClass}`;
-        const holes = isMonster && sign === "holes" ? holesHTML() : "";
+        const extras = isMonster ? signExtrasHTML(sign) : "";
         if (type === "capibara") {
           return `<div class="${cls}" data-type="${type}" data-sign="${sign || ""}">
             <div class="ear l"></div><div class="ear r"></div>
@@ -1486,7 +1871,7 @@
             <div class="nose"></div>
             <div class="leg l"></div><div class="leg r"></div>
             <div class="eye l"></div><div class="eye r"></div>
-            ${holes}
+            ${extras}
           </div>`;
         }
         if (type === "giraffe") {
@@ -1496,7 +1881,7 @@
             <div class="body"></div>
             <div class="leg l"></div><div class="leg r"></div>
             <div class="eye l"></div><div class="eye r"></div>
-            ${holes}
+            ${extras}
           </div>`;
         }
         return `<div class="${cls}" data-type="${type}" data-sign="${sign || ""}">
@@ -1505,17 +1890,93 @@
           <div class="body"></div>
           <div class="leg l"></div><div class="leg r"></div>
           <div class="eye l"></div><div class="eye r"></div>
-          ${holes}
+          ${extras}
         </div>`;
       }
 
       function createGuest() {
         const type = ANIMAL_TYPES[Math.floor(Math.random() * ANIMAL_TYPES.length)];
-        const isMonster = Math.random() < MONSTER_CHANCE;
+        const isMonster = Math.random() < getMonsterChance();
         const sign = isMonster
           ? MONSTER_SIGNS[Math.floor(Math.random() * MONSTER_SIGNS.length)]
           : null;
         return { type, isMonster, sign, id: Date.now() + Math.random() };
+      }
+
+      function getGuestInterval() {
+        const fasterByRooms = Math.max(0, state.roomCount - BASE_ROOM_COUNT) * 1000;
+        return Math.max(MIN_GUEST_INTERVAL, BASE_GUEST_INTERVAL - fasterByRooms);
+      }
+
+      function getMonsterChance() {
+        return Math.min(0.85, BASE_MONSTER_CHANCE + state.boostMonsters * 0.1);
+      }
+
+      function applySalary(delta) {
+        if (delta <= 0 || state.boostSalary <= 0) return delta;
+        return Math.round(delta * (1 + state.boostSalary * 0.25));
+      }
+
+      function pointsWord(n) {
+        const abs = Math.abs(n) % 100;
+        const d = abs % 10;
+        if (abs > 10 && abs < 20) return "очков";
+        if (d === 1) return "очко";
+        if (d >= 2 && d <= 4) return "очка";
+        return "очков";
+      }
+
+      function formatCoins(amount) {
+        const word = pointsWord(amount);
+        if (amount > 0) return `+${amount} ${word}`;
+        if (amount < 0) return `${amount} ${word}`;
+        return `0 очков`;
+      }
+
+      function spendPoints(price) {
+        if (state.score < price) return false;
+        state.score -= price;
+        return true;
+      }
+
+      function addScore(delta) {
+        let gained = applySalary(delta);
+        if (delta > 0 && state.doubleNextReward) {
+          gained *= 2;
+          state.doubleNextReward = false;
+        }
+        if (delta > 0 && state.boostPoints > 0) {
+          gained += state.boostPoints * 4;
+        }
+        state.score = Math.max(0, state.score + gained);
+        state.roundScore += gained;
+        updateHUD();
+        updateShopUI();
+        return gained;
+      }
+
+      function restartGuestSpawner() {
+        clearInterval(state.guestInterval);
+        state.guestInterval = null;
+        if (!state.playing) return;
+        state.guestInterval = setInterval(() => {
+          if (state.playing) enqueueGuest();
+        }, getGuestInterval());
+      }
+
+      function setBoostBar(barEl, level) {
+        [...barEl.querySelectorAll(".seg")].forEach((seg, i) => {
+          seg.classList.toggle("on", i < level);
+        });
+      }
+
+      function switchShopTab(tab) {
+        el.tabItems.classList.toggle("active", tab === "items");
+        el.tabBoosters.classList.toggle("active", tab === "boosters");
+        el.tabCoins.classList.toggle("active", tab === "coins");
+        el.sectionItems.classList.toggle("active", tab === "items");
+        el.sectionBoosters.classList.toggle("active", tab === "boosters");
+        el.sectionCoins.classList.toggle("active", tab === "coins");
       }
 
       function guestSprite(guest, forceNormal = false) {
@@ -1575,11 +2036,13 @@
         el.statCheckouts.textContent = state.checkouts;
         el.statMonsters.textContent = state.monstersRejected;
         el.statScore.textContent = state.score;
-        el.statCoins.textContent = state.coins;
-        el.timer.textContent = Math.ceil(state.timeLeft);
+        el.statRoundScore.textContent = state.roundScore;
+        const mins = Math.floor(Math.max(0, state.timeLeft) / 60);
+        const secs = Math.ceil(Math.max(0, state.timeLeft) % 60);
+        el.timer.textContent = `${mins}:${String(secs).padStart(2, "0")}`;
         const pct = Math.max(0, (state.timeLeft / ROUND_SEC) * 100);
         el.timerFill.style.width = pct + "%";
-        el.timerFill.classList.toggle("urgent", state.timeLeft <= 8);
+        el.timerFill.classList.toggle("urgent", state.timeLeft <= 20);
       }
 
       function setButtons(enabled) {
@@ -1608,25 +2071,66 @@
         }, 1200);
       }
 
-      function addScore(delta) {
-        state.score += delta;
-        state.coins = Math.max(0, state.coins + delta);
-        updateHUD();
-        updateShopUI();
-      }
-
       function updateShopUI() {
-        el.shopCoins.textContent = state.coins;
+        el.shopCoins.textContent = state.score;
         el.shopRoomCount.textContent = state.roomCount;
-        el.btnBuyRoom.disabled = state.coins < SHOP.extraRoom || state.roomCount >= MAX_ROOMS;
-        el.btnBuySkip.disabled = !state.playing || state.coins < SHOP.skipRound;
+        el.shopGuestInterval.textContent = (getGuestInterval() / 1000).toFixed(0);
+        el.btnBuyRoom.disabled = state.score < SHOP.extraRoom || state.roomCount >= MAX_ROOMS;
+        el.btnBuySkip.disabled = !state.playing || state.score < SHOP.skipRound;
         el.btnBuyRoom.textContent =
           state.roomCount >= MAX_ROOMS ? "Макс." : "Купить";
         el.btnBuySkip.textContent = state.playing ? "Купить" : "Только в раунде";
+
+        setBoostBar(el.barSalary, state.boostSalary);
+        setBoostBar(el.barMonsters, state.boostMonsters);
+        setBoostBar(el.barPoints, state.boostPoints);
+
+        const salaryMax = state.boostSalary >= MAX_BOOST;
+        const monsterMax = state.boostMonsters >= MAX_BOOST;
+        const pointsMax = state.boostPoints >= MAX_BOOST;
+        el.btnBoostSalary.disabled = salaryMax || state.score < SHOP.salary;
+        el.btnBoostMonsters.disabled = monsterMax || state.score < SHOP.monsters;
+        el.btnBoostPoints.disabled = pointsMax || state.score < SHOP.points;
+        el.btnBoostSalary.querySelector(".booster-price").textContent = salaryMax
+          ? "Макс. уровень"
+          : `${SHOP.salary} очков`;
+        el.btnBoostMonsters.querySelector(".booster-price").textContent = monsterMax
+          ? "Макс. уровень"
+          : `${SHOP.monsters} очков`;
+        el.btnBoostPoints.querySelector(".booster-price").textContent = pointsMax
+          ? "Макс. уровень"
+          : `${SHOP.points} очков`;
+
+        el.coinItems.querySelectorAll("[data-coin-item]").forEach((row) => {
+          const id = row.dataset.coinItem;
+          const item = COIN_ITEMS[id];
+          const btn = row.querySelector("button");
+          let disabled = state.score < item.price;
+          let label = "Купить";
+          if (id === "guard" && state.guardShield) {
+            disabled = true;
+            label = "Уже есть";
+          }
+          if (id === "double" && state.doubleNextReward) {
+            disabled = true;
+            label = "Уже есть";
+          }
+          if (id === "time" && !state.playing) {
+            disabled = true;
+            label = "В раунде";
+          }
+          if (id === "key" && (!state.playing || occupiedCount() === 0)) {
+            disabled = true;
+            label = state.playing ? "Нет занятых" : "В раунде";
+          }
+          btn.disabled = disabled;
+          btn.textContent = label;
+        });
       }
 
       function openShop(from) {
         state.shopOpenedFrom = from;
+        switchShopTab("items");
         updateShopUI();
         el.shopOverlay.classList.remove("hidden");
         el.shopOverlay.setAttribute("aria-hidden", "false");
@@ -1639,24 +2143,26 @@
       }
 
       function buyExtraRoom() {
-        if (state.coins < SHOP.extraRoom) {
-          showToast("Недостаточно монет", "bad");
-          return;
-        }
         if (state.roomCount >= MAX_ROOMS) {
           showToast("Больше номеров нельзя", "warn");
           return;
         }
-        state.coins -= SHOP.extraRoom;
+        if (!spendPoints(SHOP.extraRoom)) {
+          showToast("Недостаточно очков", "bad");
+          return;
+        }
         if (state.playing) {
           addExtraRoom();
+          restartGuestSpawner();
         } else {
           state.roomCount += 1;
           buildRooms();
           updateHUD();
         }
         updateShopUI();
-        showToast(`Новый номер куплен! −${SHOP.extraRoom}`);
+        showToast(
+          `Номер куплен! Гости каждые ${getGuestInterval() / 1000} с (−${SHOP.extraRoom} ${pointsWord(SHOP.extraRoom)})`
+        );
         setDinoMood("happy");
       }
 
@@ -1666,15 +2172,108 @@
           updateShopUI();
           return;
         }
-        if (state.coins < SHOP.skipRound) {
-          showToast("Недостаточно монет", "bad");
+        if (!spendPoints(SHOP.skipRound)) {
+          showToast("Недостаточно очков", "bad");
           return;
         }
-        state.coins -= SHOP.skipRound;
         updateHUD();
         closeShop();
-        showToast(`Раунд пропущен −${SHOP.skipRound}`, "warn");
+        showToast(`Раунд пропущен (−${SHOP.skipRound} ${pointsWord(SHOP.skipRound)})`, "warn");
         endRound();
+      }
+
+      function buyBoost(kind) {
+        const map = {
+          salary: { key: "boostSalary", price: SHOP.salary, title: "Зарплата" },
+          monsters: { key: "boostMonsters", price: SHOP.monsters, title: "Монстры" },
+          points: { key: "boostPoints", price: SHOP.points, title: "Очки" },
+        };
+        const conf = map[kind];
+        if (!conf) return;
+        if (state[conf.key] >= MAX_BOOST) {
+          showToast("Уже максимальный уровень", "warn");
+          return;
+        }
+        if (!spendPoints(conf.price)) {
+          showToast("Недостаточно очков", "bad");
+          return;
+        }
+        state[conf.key] += 1;
+        updateHUD();
+        updateShopUI();
+        showToast(`${conf.title} ур. ${state[conf.key]}/${MAX_BOOST}`);
+        setDinoMood("happy");
+      }
+
+      function buyCoinItem(id) {
+        const item = COIN_ITEMS[id];
+        if (!item) return;
+
+        if (id === "cookies") {
+          if (!spendPoints(item.price)) {
+            showToast("Недостаточно очков", "bad");
+            return;
+          }
+          state.score += 40;
+          state.roundScore += 40;
+          showToast(`Печенье! +40 очков (−${item.price} ${pointsWord(item.price)})`);
+        } else if (id === "time") {
+          if (!state.playing) {
+            showToast("Доп. время только во время раунда", "warn");
+            return;
+          }
+          if (!spendPoints(item.price)) {
+            showToast("Недостаточно очков", "bad");
+            return;
+          }
+          state.timeLeft += 20;
+          showToast(`+20 секунд к раунду (−${item.price} ${pointsWord(item.price)})`);
+        } else if (id === "guard") {
+          if (state.guardShield) {
+            showToast("Охранник уже нанят", "warn");
+            return;
+          }
+          if (!spendPoints(item.price)) {
+            showToast("Недостаточно очков", "bad");
+            return;
+          }
+          state.guardShield = true;
+          showToast(`Охранник готов (−${item.price} ${pointsWord(item.price)})`);
+        } else if (id === "double") {
+          if (state.doubleNextReward) {
+            showToast("Удвоитель уже активен", "warn");
+            return;
+          }
+          if (!spendPoints(item.price)) {
+            showToast("Недостаточно очков", "bad");
+            return;
+          }
+          state.doubleNextReward = true;
+          showToast(`Удвоитель активен (−${item.price} ${pointsWord(item.price)})`);
+        } else if (id === "key") {
+          if (!state.playing) {
+            showToast("Ключ только во время раунда", "warn");
+            return;
+          }
+          const occupied = state.rooms.filter((r) => r.occupied);
+          if (occupied.length === 0) {
+            showToast("Нет занятых номеров", "warn");
+            return;
+          }
+          if (!spendPoints(item.price)) {
+            showToast("Недостаточно очков", "bad");
+            return;
+          }
+          const room = occupied[Math.floor(Math.random() * occupied.length)];
+          vacateRoom(room);
+          state.checkouts++;
+          const gained = addScore(SCORES.autoCheckout);
+          showToast(`Ключ открыл номер! ${formatCoins(gained)} (−${item.price} ${pointsWord(item.price)})`);
+        }
+
+        updateHUD();
+        updateShopUI();
+        setDinoMood("happy");
       }
 
       function renderGuestAtDesk(guest) {
@@ -1794,13 +2393,21 @@
         setButtons(false);
 
         if (guest.isMonster) {
-          addScore(SCORES.checkinMonster);
+          if (state.guardShield) {
+            state.guardShield = false;
+            const gained = addScore(-5);
+            setDinoMood("happy");
+            showToast(`Охранник спас отель! ${formatCoins(gained)}`, "warn");
+            animateLeave(false, finishReceptionAction);
+            return;
+          }
+          const gained = addScore(SCORES.checkinMonster);
           const eaten = eatAllGuests();
           setDinoMood("sad");
           showToast(
             eaten > 0
-              ? `Монстр съел всех гостей! (${eaten}) ${SCORES.checkinMonster}`
-              : `Вы заселили монстра! ${SCORES.checkinMonster}`,
+              ? `Монстр съел всех гостей! (${eaten}) ${formatCoins(gained)}`
+              : `Вы заселили монстра! ${formatCoins(gained)}`,
             "bad"
           );
           animateLeave(false, finishReceptionAction);
@@ -1808,9 +2415,9 @@
         }
 
         if (freeRoomCount() === 0) {
-          addScore(SCORES.noRooms);
+          const gained = addScore(SCORES.noRooms);
           setDinoMood("sad");
-          showToast(`Нет свободных номеров! ${SCORES.noRooms}`, "bad");
+          showToast(`Нет свободных номеров! ${formatCoins(gained)}`, "bad");
           // Guest stays? Spec says can't check in — penalty. Guest leaves disappointed.
           animateLeave(false, finishReceptionAction);
           return;
@@ -1818,9 +2425,9 @@
 
         occupyRoom(guest);
         state.checkins++;
-        addScore(SCORES.checkinGood);
+        const gained = addScore(SCORES.checkinGood);
         setDinoMood("happy");
-        showToast(`Заселили: ${ANIMAL_NAMES[guest.type]}! +${SCORES.checkinGood}`);
+        showToast(`Заселили: ${ANIMAL_NAMES[guest.type]}! ${formatCoins(gained)}`);
         updateHUD();
         animateLeave(false, finishReceptionAction);
       }
@@ -1833,46 +2440,72 @@
 
         if (guest.isMonster) {
           state.monstersRejected++;
-          addScore(SCORES.rejectMonster);
+          const gained = addScore(SCORES.rejectMonster);
           setDinoMood("happy");
-          showToast(`Монстра прогнали! +${SCORES.rejectMonster}`);
+          showToast(`Монстра прогнали! ${formatCoins(gained)}`);
         } else {
-          addScore(SCORES.rejectGood);
+          const gained = addScore(SCORES.rejectGood);
           setDinoMood("sad");
-          showToast(`Прогнали доброго зверя… ${SCORES.rejectGood}`, "bad");
+          showToast(`Прогнали доброго зверя… ${formatCoins(gained)}`, "bad");
         }
         updateHUD();
         animateLeave(false, finishReceptionAction);
       }
 
       function autoCheckout() {
-        if (!state.playing || state.receptionBusy) return;
-        const occupied = state.rooms.filter((r) => r.occupied);
-        if (occupied.length === 0) return;
+        if (!state.playing) return;
 
-        // If there's a guest at desk, checkout waits (reception busy queue)
-        if (state.currentGuest) return;
+        const canCheckout =
+          !state.receptionBusy &&
+          !state.currentGuest &&
+          state.rooms.some((r) => r.occupied);
+
+        if (!canCheckout) {
+          // Ресепшен занят или номеров нет — попробуем чуть позже
+          clearTimeout(state.checkoutTimer);
+          state.checkoutTimer = setTimeout(() => {
+            if (state.playing) autoCheckout();
+          }, 1000);
+          return;
+        }
 
         state.receptionBusy = true;
         setButtons(false);
 
+        const occupied = state.rooms.filter((r) => r.occupied);
         const room = occupied[Math.floor(Math.random() * occupied.length)];
         const guest = vacateRoom(room);
         updateHUD();
 
-        // Show at reception briefly then leave
         el.guestSlot.innerHTML = guestSprite(guest, true);
         showToast(`${ANIMAL_NAMES[guest.type]} выселяется…`, "warn");
 
         setTimeout(() => {
           state.checkouts++;
-          addScore(SCORES.autoCheckout);
-          showToast(`Выселение +${SCORES.autoCheckout}`);
+          const gained = addScore(SCORES.autoCheckout);
+          showToast(`Выселение ${formatCoins(gained)}`);
           updateHUD();
           animateLeave(true, () => {
             finishReceptionAction();
           });
         }, 500);
+
+        scheduleNextCheckout();
+      }
+
+      function randomCheckoutDelay() {
+        return (
+          CHECKOUT_MIN_MS +
+          Math.floor(Math.random() * (CHECKOUT_MAX_MS - CHECKOUT_MIN_MS + 1))
+        );
+      }
+
+      function scheduleNextCheckout() {
+        clearTimeout(state.checkoutTimer);
+        if (!state.playing) return;
+        state.checkoutTimer = setTimeout(() => {
+          if (state.playing) autoCheckout();
+        }, randomCheckoutDelay());
       }
 
       function clearGuestSpawnTimers() {
@@ -1885,12 +2518,12 @@
       function endRound() {
         state.playing = false;
         clearGuestSpawnTimers();
-        clearInterval(state.checkoutTimer);
+        clearTimeout(state.checkoutTimer);
         clearInterval(state.roundTimer);
         state.checkoutTimer = state.roundTimer = null;
         setButtons(false);
 
-        el.resScore.textContent = state.score;
+        el.resScore.textContent = state.roundScore;
         el.resCheckins.textContent = state.checkins;
         el.resCheckouts.textContent = state.checkouts;
         el.resMonsters.textContent = state.monstersRejected;
@@ -1902,13 +2535,13 @@
 
       function startRound() {
         clearGuestSpawnTimers();
-        clearInterval(state.checkoutTimer);
+        clearTimeout(state.checkoutTimer);
         clearInterval(state.roundTimer);
         clearTimeout(state.dinoMoodTimer);
         closeShop();
 
         state.playing = true;
-        state.score = 0;
+        state.roundScore = 0;
         state.checkins = 0;
         state.checkouts = 0;
         state.monstersRejected = 0;
@@ -1919,6 +2552,8 @@
 
         el.startOverlay.classList.add("hidden");
         el.startOverlay.setAttribute("aria-hidden", "true");
+        el.devsOverlay.classList.add("hidden");
+        el.devsOverlay.setAttribute("aria-hidden", "true");
         el.resultsOverlay.classList.add("hidden");
         el.resultsOverlay.setAttribute("aria-hidden", "true");
         clearGuestSlot();
@@ -1928,18 +2563,14 @@
         el.dino.classList.remove("happy", "sad");
         updateHUD();
 
-        // Первый гость сразу, следующие — каждые 7 сек
+        // Первый гость сразу, дальше — от числа номеров (база 10 с, −1 с за номер)
         state.guestTimer = setTimeout(() => {
           if (!state.playing) return;
           enqueueGuest();
-          state.guestInterval = setInterval(() => {
-            if (state.playing) enqueueGuest();
-          }, GUEST_INTERVAL);
+          restartGuestSpawner();
         }, FIRST_GUEST_DELAY);
 
-        state.checkoutTimer = setInterval(() => {
-          if (state.playing) autoCheckout();
-        }, CHECKOUT_INTERVAL);
+        scheduleNextCheckout();
 
         const tickMs = 100;
         state.roundTimer = setInterval(() => {
@@ -1955,6 +2586,18 @@
       }
 
       el.btnStart.addEventListener("click", startRound);
+      el.btnDevs.addEventListener("click", () => {
+        el.startOverlay.classList.add("hidden");
+        el.startOverlay.setAttribute("aria-hidden", "true");
+        el.devsOverlay.classList.remove("hidden");
+        el.devsOverlay.setAttribute("aria-hidden", "false");
+      });
+      el.btnDevsBack.addEventListener("click", () => {
+        el.devsOverlay.classList.add("hidden");
+        el.devsOverlay.setAttribute("aria-hidden", "true");
+        el.startOverlay.classList.remove("hidden");
+        el.startOverlay.setAttribute("aria-hidden", "false");
+      });
       el.btnAgain.addEventListener("click", startRound);
       el.btnCheckin.addEventListener("click", onCheckin);
       el.btnReject.addEventListener("click", onReject);
@@ -1963,6 +2606,19 @@
       el.btnShopClose.addEventListener("click", closeShop);
       el.btnBuyRoom.addEventListener("click", buyExtraRoom);
       el.btnBuySkip.addEventListener("click", buySkipRound);
+      el.tabItems.addEventListener("click", () => switchShopTab("items"));
+      el.tabBoosters.addEventListener("click", () => switchShopTab("boosters"));
+      el.tabCoins.addEventListener("click", () => switchShopTab("coins"));
+      el.btnBoostSalary.addEventListener("click", () => buyBoost("salary"));
+      el.btnBoostMonsters.addEventListener("click", () => buyBoost("monsters"));
+      el.btnBoostPoints.addEventListener("click", () => buyBoost("points"));
+      el.coinItems.addEventListener("click", (e) => {
+        const btn = e.target.closest("button");
+        if (!btn || btn.disabled) return;
+        const row = btn.closest("[data-coin-item]");
+        if (!row) return;
+        buyCoinItem(row.dataset.coinItem);
+      });
 
       // Keyboard shortcuts
       document.addEventListener("keydown", (e) => {
